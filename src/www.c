@@ -85,10 +85,24 @@ __private CURL* www_curl_new(const char* url){
 	curl_easy_setopt(ch, CURLOPT_URL, url);
 	if( !strncmp(url, "https", 5) )
 		curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 1L);
-	else
+	else {
 		curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(ch, CURLOPT_TCP_FASTOPEN, 1L); // TLS session cache does not work when TCP Fast Open is enabled.
+	}
+
 	curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
 	curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
+
+    // enable all supported built-in compressions
+	curl_easy_setopt(ch, CURLOPT_ACCEPT_ENCODING, "");
+	curl_easy_setopt(ch, CURLOPT_HTTP_CONTENT_DECODING, 1L);
+
+    // maximum number of connections that libcurl may keep alive in its connection cache after use
+    // curl_easy_setopt(ch, CURLOPT_MAXCONNECTS, 30L);
+
+	// only allow each connection to be reused for 60 seconds
+    // curl_easy_setopt(ch, CURLOPT_MAXLIFETIME_CONN, 60L);
+
 	return ch;
 }
 
